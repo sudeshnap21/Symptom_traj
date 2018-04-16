@@ -51,16 +51,23 @@ summary(mcmc(muSamp1))
 
 
 #clustering specific code
-delta<-2
+delta<-1
 tpred=seq(0,24,by=delta)
 Npred=length(tpred)
-mepds=cbind(rep(0,Npred),rep(0,Npred),rep(30,Npred))
-tage=rep(30,Npred)
-fit <- fitted(mod[[1]], x = list(mepds,tage, tage, tpred), z = list(tpred, tpred, tpred, "empty"), glmer = TRUE)
 
-fit <- fitted(mod[[1]], x = list("empty","empty", "empty", tpred), z = list(tpred, tpred, tpred, "empty"), glmer = TRUE)
-names(fit) <- c("EPDS", "PSS", "Sleephrs",  "Fatigue")
+mu_TNF_mean=rep(mean(a1$TNF_mean, na.rm=T),Npred)
+mu_TNF_del=rep(0,Npred)
+mu_IL6_mean=rep(mean(a1$IL6_mean, na.rm=T),Npred)
+mu_IL6_del=rep(0,Npred)
+mu_IL10=rep(mean(a1$IL10, na.rm=T), Npred)
+mepds=cbind(rep(0,Npred),mu_TNF_mean, mu_TNF_del,mu_IL10)
+msleephrs=cbind(mu_IL6_mean, mu_IL6_del)
+
+fit <- fitted(mod[[1]], x = list(mepds,"empty", msleephrs, tpred), z = list(tpred, tpred, tpred, "empty"), glmer = TRUE)
+names(fit) <- c("EPDS", "PSS", "Sleephrs", "Fatigue")
 print(fit[["EPDS"]][1:3, ], digits = 5)
+ip<-getProfiles(t="Time", y=c("EPDS", "PSS", "Sleephrs", "IL6","IL10", "TNF", "Fatigue", "jFatigue"), id="id", data=a1)
+
 
 K <- mod[[1]]$prior.b$Kmax
 clCOL <- c("blue", "red")
@@ -70,8 +77,9 @@ for (k in 1:K) lines(tpred, fit[["EPDS"]][, k], col = clCOL[k], lwd = 5)
 
 K <- mod[[1]]$prior.b$Kmax
 clCOL <- c("blue", "red")
-plotProfiles(ip = ip, data = a1, var = "PSS", tvar = "Time", points=TRUE ,col = "azure3", xlab = "Time", ylab = "PSS", lwd=2)
+plotProfiles(ip = ip, data = a1, var = "PSS", tvar = "Time", points=TRUE ,col = "azure3", xlab = "Time", ylab = "Total PSS", lwd=2)
 for (k in 1:K) lines(tpred, fit[["PSS"]][, k], col = clCOL[k], lwd = 5)
+
 
 K <- mod[[1]]$prior.b$Kmax
 clCOL <- c("blue", "red")
@@ -83,6 +91,7 @@ K <- mod[[1]]$prior.b$Kmax
 clCOL <- c("blue", "red")
 plotProfiles(ip = ip, data = a1, var = "jFatigue", tvar = "Time", points=TRUE ,col = "azure3", xlab = "Time", ylab = "Fatigue (yes/no)", lines=FALSE)
 for (k in 1:K) lines(tpred, fit[["Fatigue"]][, k], col = clCOL[k], lwd = 5)
+
 
 #median post prob
 
@@ -97,7 +106,7 @@ GCOL <-c("cornflowerblue", "coral")
 names(GCOL) <- levels(a1$groupMed)
 
 par(cex.axis=1.5, cex.lab=1.5, cex.main=1.2, cex.sub=1)
-ip<-getProfiles(t="Time", y=c("EPDS", "PSS", "Sleephrs", "jFatigue", "groupMed"), id="id", data=a1)
+ip<-getProfiles(t="Time", y=c("EPDS", "PSS", "Sleephrs", "jFatigue", "IL6", "IL10", "TNF", "groupMed"), id="id", data=a1)
 
 plotProfiles(ip = ip, data = a1, var = "EPDS", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time (months)",ylab = "EPDS", lwd=2)
 plotProfiles(ip = ip, data = a1, var = "PSS", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time (months)",ylab = "PSS", lwd=2)
