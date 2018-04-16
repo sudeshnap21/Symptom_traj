@@ -1,6 +1,11 @@
-#Load Package: reshape dplyr nlme RColorBrewer mixAK***/
+#Load Package: mixAK and dependencies***/
+library(colorspace)
+library(lme4)
+library(Matrix)
+library(mixAK)
 
-data<- read.csv(file="T:\\Paper\\LCMM\\paper1\\data_final2.csv",head=TRUE,sep=",")
+setwd(file.path("T:\\Paper\\LCMM\\paper1"))
+data<- read.csv(file="data_final2.csv",header=TRUE,sep=",")
 a1=data.frame(data)
 colnames(a1)[1]="id"
 
@@ -18,6 +23,9 @@ mod<-GLMM_MCMC(y=a1[,c("EPDS","PSS", "Sleephrs", "Fatigue")], dist=c("gaussian",
 #Trial 2: symptoms model+biomarkers
 set.seed(20042007)
 mod<-GLMM_MCMC(y=a1[,c("EPDS","PSS", "Sleephrs", "IL6" , "IL10","Fatigue")], dist=c("gaussian","gaussian", "gaussian", "gaussian", "gaussian","binomial(logit)" ), id=a1[,"id"], x=list(EPDS=a1[,c("depression_hx","depression_famhx")], PSS="empty", sleephrs_avg="empty", IL6= "empty", IL10="empty", Fatigue=a1[,"Weeks"]),z=list(EPDS=a1[,"Weeks"],PSS=a1[,"Weeks"], Sleephrs=a1[,"Weeks"],IL6=a1[,"Weeks"], IL10=a1[,"Weeks"], Fatigue="empty"), random.intercept=rep(TRUE,6), prior.b=list(Kmax=2), nMCMC=c(burn=200,keep=2000, thin=50, info=200), parallel=FALSE)
+
+
+#analysing the output
 
 library("coda")
 mod <- NMixRelabel(mod, type = "stephens", keep.comp.prob = TRUE)
