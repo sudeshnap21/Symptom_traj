@@ -122,7 +122,7 @@ t.test(a1_time$sleephrs_avg~a1_time$groupMed)
 by(a1_time$age,a1_time$groupMed, sd, na.rm=T)
 t.test(a1_time$age~a1_time$groupMed)
 
-tbl = table(a1_time$depression_hx, a1_time$groupMed)
+tbl = table(a1_time$depression_famhx, a1_time$groupMed)
 chisq.test(tbl)
 
 
