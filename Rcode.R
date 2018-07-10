@@ -51,8 +51,10 @@ summary(mcmc(muSamp1))
 
 
 #clustering specific code
-delta<-1
+delta<-0.1
 tpred=seq(0,24,by=delta)
+
+#tpred=c(0,1,2,4,8,12,24)
 Npred=length(tpred)
 
 mu_TNF_mean=rep(mean(a1$TNF_mean, na.rm=T),Npred)
@@ -61,17 +63,17 @@ mu_IL6_mean=rep(mean(a1$IL6_mean, na.rm=T),Npred)
 mu_IL6_del=rep(0,Npred)
 mu_IL10=rep(mean(a1$IL10, na.rm=T), Npred)
 mepds=cbind(rep(0,Npred),mu_TNF_mean, mu_TNF_del,mu_IL10)
-msleephrs=cbind(mu_IL6_mean, mu_IL6_del)
+msleephrs=cbind(mu_IL6_mean, mu_IL6_del, mu_IL10)
 
 fit <- fitted(mod[[1]], x = list(mepds,"empty", msleephrs, tpred), z = list(tpred, tpred, tpred, "empty"), glmer = TRUE)
 names(fit) <- c("EPDS", "PSS", "Sleephrs", "Fatigue")
 print(fit[["EPDS"]][1:3, ], digits = 5)
-ip<-getProfiles(t="Time", y=c("EPDS", "PSS", "Sleephrs", "IL6","IL10", "TNF", "Fatigue", "jFatigue"), id="id", data=a1)
+ip<-getProfiles(t="Weeks", y=c("EPDS", "PSS", "Sleephrs", "IL6","IL10", "TNF", "Fatigue", "jFatigue"), id="id", data=a1)
 
 
 K <- mod[[1]]$prior.b$Kmax
 clCOL <- c("blue", "red")
-plotProfiles(ip = ip, data = a1, var = "EPDS", tvar = "Time", points=TRUE ,col = "azure3", xlab = "Time", ylab = "Total EPDS", lwd=2)
+plotProfiles(ip = ip, data = a1, var = "EPDS", tvar = "Weeks", points=TRUE ,col = "azure3", xlab = "Time", ylab = "Total EPDS", lwd=2)
 for (k in 1:K) lines(tpred, fit[["EPDS"]][, k], col = clCOL[k], lwd = 5)
 
 
@@ -102,18 +104,17 @@ table(groupMed)
 
 TAB <- table(a1$id)
 a1$groupMed <- factor(rep(groupMed, TAB))
-GCOL <-c("cornflowerblue", "coral") 
-names(GCOL) <- levels(a1$groupMed)
+
 
 par(cex.axis=1.5, cex.lab=1.5, cex.main=1.2, cex.sub=1)
-ip<-getProfiles(t="Time", y=c("EPDS", "PSS", "Sleephrs", "jFatigue", "IL6", "IL10", "TNF", "groupMed"), id="id", data=a1)
+ip<-getProfiles(t="Weeks", y=c("EPDS", "PSS", "Sleephrs", "jFatigue", "IL6", "IL10", "TNF", "groupMed"), id="id", data=a1)
 
-plotProfiles(ip = ip, data = a1, var = "EPDS", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time (months)",ylab = "EPDS", lwd=2)
-plotProfiles(ip = ip, data = a1, var = "PSS", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time (months)",ylab = "PSS", lwd=2)
-plotProfiles(ip = ip, data = a1, var = "Fatigue", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time",ylab = "Fatigue")
-plotProfiles(ip = ip, data = a1, var = "Sleephrs", tvar = "Time", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Time",ylab = "Average sleep hours", lwd=2)
+plotProfiles(ip = ip, data = a1, var = "EPDS", tvar = "Weeks", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Weeks",ylab = "EPDS", lwd=2)
+plotProfiles(ip = ip, data = a1, var = "PSS", tvar = "Weeks", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Weeks",ylab = "PSS", lwd=2)
+plotProfiles(ip = ip, data = a1, var = "jFatigue", tvar = "Weeks", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Weeks",ylab = "Fatigue")
+plotProfiles(ip = ip, data = a1, var = "Sleephrs", tvar = "Weeks", gvar = "groupMed", col = GCOL, auto.layout = FALSE, xlab = "Weeks",ylab = "Average sleep hours", lwd=2)
 
-
+###Baseline factors by group#
 
 a1_time=a1[a1$Time == 1, ]
 by(a1_time$sleephrs_avg,a1_time$groupMed, sd, na.rm=T)

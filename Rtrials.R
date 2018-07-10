@@ -26,5 +26,6 @@ print(PED, digits=6)
 set.seed(1234567)
 mod<-GLMM_MCMC(y=a1[,c("EPDS","PSS", "Sleephrs", "Fatigue")], dist=c("gaussian","gaussian", "gaussian", "binomial(logit)" ), id=a1[,"id"], x=list(EPDS=a1[,c("depression_hx", "TNF_mean", "TNF_del","IL10")], PSS="empty", sleephrs_avg=a1[,c("IL6_mean", "IL6_del", "IL10")], Fatigue=a1[,"Weeks"]),z=list(EPDS=a1[,"Weeks"],PSS=a1[,"Weeks"], Sleephrs=a1[,"Weeks"], Fatigue="empty"), random.intercept=rep(TRUE,4), prior.b=list(Kmax=2), nMCMC=c(burn=500,keep=2500, thin=50, info=200), parallel=FALSE)
 
+#overall: 1 cluster
 mod1<-GLMM_MCMC(y=a1[,c("EPDS","PSS", "Sleephrs", "Fatigue")], dist=c("gaussian","gaussian", "gaussian", "binomial(logit)" ), id=a1[,"id"], x=list(EPDS=a1[,c("depression_hx", "TNF_mean", "TNF_del","IL10")], PSS="empty", sleephrs_avg=a1[,c("IL6_mean", "IL6_del", "IL10")], Fatigue=a1[,"Weeks"]),z=list(EPDS=a1[,"Weeks"],PSS=a1[,"Weeks"], Sleephrs=a1[,"Weeks"], Fatigue="empty"), random.intercept=rep(TRUE,4), prior.b=list(Kmax=1), nMCMC=c(burn=500,keep=2000, thin=50, info=200), parallel=FALSE)
 
